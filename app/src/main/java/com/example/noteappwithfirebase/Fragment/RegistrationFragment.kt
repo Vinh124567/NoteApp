@@ -31,17 +31,30 @@ class RegistrationFragment : Fragment(R.layout.fragment_registration) {
         super.onViewCreated(view, savedInstanceState)
         notesViewModel = (activity as MainActivity).noteViewModel
         binding.buttonRegister.setOnClickListener {
-            var email=binding.editTextEmaill.text.toString()
-            var password=binding.editTextPasswordd.text.toString()
-            notesViewModel.registerWithEmail(email,password){isRegis,uid ->
+            var email = binding.editTextEmaill.text.toString()
+            var password = binding.editTextPasswordd.text.toString()
+            if (email.isNotEmpty() || password.isNotEmpty()){
+            notesViewModel.registerWithEmail(email, password) { isRegis, uid ->
                 if (isRegis) {
                     uid?.let {
-                        Toast.makeText(requireActivity(), "Đăng ký thành công", Toast.LENGTH_SHORT).show()
-                        view.findNavController().navigate(R.id.action_registrationFragment_to_loginFragment)
+                        Toast.makeText(requireActivity(), "Đăng ký thành công", Toast.LENGTH_SHORT)
+                            .show()
+                        view.findNavController()
+                            .navigate(R.id.action_registrationFragment_to_loginFragment)
                     }
                 } else {
-                    Toast.makeText(requireActivity(), "Đăng ký không thành công", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireActivity(),
+                        "Đăng ký không thành công",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
+            }
+        }else{
+                Toast.makeText(
+                    requireActivity(),
+                    "Vui lòng điền đủ thông tin",
+                    Toast.LENGTH_SHORT).show()
             }
 
 

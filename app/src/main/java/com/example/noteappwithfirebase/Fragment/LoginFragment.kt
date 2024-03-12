@@ -1,6 +1,7 @@
 package com.example.noteappwithfirebase.Fragment
 
 import android.os.Bundle
+import android.util.Patterns
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -45,15 +46,30 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         }
 
         binding.buttonLogin.setOnClickListener { view ->
-            val userInput = binding.editTextEmail.text.toString()
-            val userPassword = binding.editTextPassword.text.toString()
-            notesViewModel.loginWithEmail(userInput,userPassword){ isLogin->
-                if(isLogin){
-                    Toast.makeText(requireActivity(), "Đăng nhập thành công", Toast.LENGTH_SHORT).show()
-                    view.findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
-                }else{
-                    Toast.makeText(requireActivity(), "tài khoản hoặc mật khẩu không chính xác", Toast.LENGTH_SHORT).show()
+            val userInput = binding.editTextEmail.text.toString().trim()
+            val userPassword = binding.editTextPassword.text.toString().trim()
+            if (userInput.isNotEmpty() || userPassword.isNotEmpty()){
+                notesViewModel.loginWithEmail(userInput, userPassword) { isLogin ->
+                    if (isLogin) {
+                        Toast.makeText(
+                            requireActivity(),
+                            "Đăng nhập thành công",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        view.findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
+                    } else {
+                        Toast.makeText(
+                            requireActivity(),
+                            "tài khoản hoặc mật khẩu không chính xác",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
+        }else{
+                Toast.makeText(
+                    requireActivity(),
+                    "Vui lòng điền đủ thông tin",
+                    Toast.LENGTH_SHORT).show()
             }
         }
 

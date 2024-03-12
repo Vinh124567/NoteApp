@@ -15,13 +15,6 @@
         android:layout_marginBottom="24dp"/>
 
     <!-- Ô nhập tên người dùng -->
-    <EditText
-        android:id="@+id/editTextUsername"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Tên người dùng"
-        android:inputType="text"/>
-
     <!-- Ô nhập email -->
     <EditText
         android:id="@+id/editTextEmaill"
