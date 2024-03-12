@@ -1,0 +1,115 @@
+package com.example.noteappwithfirebase.Responsitory
+
+import android.content.Context
+import android.util.Log
+import androidx.lifecycle.MutableLiveData
+import com.example.noteappwithfirebase.Model.Note
+import com.example.noteappwithfirebase.Model.User
+import com.google.firebase.database.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.lang.Exception
+
+class FirebaseResponsitory private constructor(context: Context) {
+    private val databaseReference: DatabaseReference= FirebaseDatabase.getInstance().getReference("Note")
+
+    companion object {
+        private var instance: FirebaseResponsitory? = null
+        operator fun invoke(context: Context) = instance ?: synchronized(this) {
+            instance ?: FirebaseResponsitory(context).also { instance = it }
+        }
+    }
+
+//    fun loadNote(noteList: MutableLiveData<List<Note>>, email: String) {
+//        val database = FirebaseDatabase.getInstance()
+//        val notesRef = database.getReference("Note/$email")
+//
+//        notesRef.addValueEventListener(object : ValueEventListener {
+//            override fun onDataChange(dataSnapshot: DataSnapshot) {
+//                val notes = mutableListOf<Note>()
+//
+//                val note = dataSnapshot.getValue(Note::class.java)
+//                note?.let {
+//                    notes.add(it)
+//                }
+//
+//                noteList.postValue(notes)
+//            }
+//
+//            override fun onCancelled(databaseError: DatabaseError) {
+//                noteList.postValue(null)
+//            }
+//        })
+//    }
+
+    suspend fun insertUser(user: User){
+        val userReference= instance?.databaseReference?.child(user.email)
+        userReference?.setValue(user)
+    }
+
+    suspend fun insertNote(note: Note, email: String) {
+        val noteReference = instance?.databaseReference?.child("users")?.child(email)?.child("notes")
+        val noteKey = noteReference?.push()?.key // Lấy khóa của node con mới
+        noteKey?.let {
+            noteReference.child(it).setValue(note) // Đặt giá trị cho node con mới với khóa là noteKey
+        }
+    }
+
+
+
+
+    fun loadNote(noteList: MutableLiveData<List<Note>>, email: String) {
+        val database = FirebaseDatabase.getInstance()
+        val notesRef = database.getReference("Note/$email") // Thay đổi đường dẫn ở đây để trỏ đến node "1"
+
+        notesRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val notes = mutableListOf<Note>()
+
+                for (noteSnapshot in dataSnapshot.children) {
+                    val note = noteSnapshot.getValue(Note::class.java)
+                    note?.let {
+                        notes.add(it)
+                    }
+                }
+                noteList.postValue(notes)
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                noteList.postValue(null)
+            }
+        })
+    }
+
+
+//    fun loadNote(NoteList: MutableLiveData<List<Note>>) {
+//        val databaseReference = instance?.databaseReference ?: return
+//        databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
+//            override fun onDataChange(snapshot: DataSnapshot) {
+//                try {
+//                    val _noteList: List<Note> = snapshot.children.mapNotNull { dataSnapshot ->
+//                        dataSnapshot.getValue(Note::class.java)
+//                    }
+//                    NoteList.postValue(_noteList)
+//                    Log.d("FirebaseResponsitoryhihi", "Number of notes: ${_noteList.size}")
+//                } catch (e: Exception) {
+//                    e.printStackTrace()
+//                }
+//            }
+//            override fun onCancelled(error: DatabaseError) {
+//                Log.e("FirebaseResponsitoryhihi", "Error loading notes: ${error.message}")
+//            }
+//        })
+//    }
+
+
+
+
+
+
+
+
+
+}
